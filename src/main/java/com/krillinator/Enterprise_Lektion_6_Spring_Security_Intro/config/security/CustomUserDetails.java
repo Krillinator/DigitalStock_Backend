@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-// TODO - Change to RECORD class (manually)
+// TODO - Change to RECORD class (manually) - NOT GOING TO WORK
 public class CustomUserDetails implements UserDetails {
 
     private final String username;

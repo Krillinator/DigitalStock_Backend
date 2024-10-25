@@ -6,6 +6,7 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.CustomUs
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,32 +15,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class TestController {
 
-    private final AppPasswordConfig appPasswordConfig;
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     @Autowired
-    public TestController(AppPasswordConfig appPasswordConfig, UserRepository userRepository) {
-        this.appPasswordConfig = appPasswordConfig;
+    public TestController(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 
     @GetMapping("/hash")
-    public String testHash(BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public String testHash() {
 
         // TODO - We want to SEE whether it's default bCryptPasswordEncoder encoder or OUR BEAN
         // TODO - We do NOT use our BEAN?!
 
-        return bCryptPasswordEncoder.encode("123");
+        return passwordEncoder.encode("123");
     }
 
-    @GetMapping("/createDefaultUser")
-    public CustomUser createDefaultUser(BCryptPasswordEncoder bCryptPasswordEncoder) {
+    // TODO - Query for already existing users with same credentials
+    // TODO - Check if UserRole.ADMIN correctly sets Authorities
 
-        // TODO - Query for already existing users with same credentials
-        // TODO - Check if UserRole.ADMIN correctly sets Authorities
+    @GetMapping("/createDefaultUser")
+    public CustomUser createDefaultUser() {
+
         CustomUser customUser = new CustomUser(
                 "Benny",
-                bCryptPasswordEncoder.encode("123"),
+                passwordEncoder.encode("123"),
                 UserRole.ADMIN,
                 true,
                 true,
