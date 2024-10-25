@@ -24,9 +24,12 @@ public class TestController {
     }
 
     @GetMapping("/hash")
-    public String testHash() {
+    public String testHash(BCryptPasswordEncoder bCryptPasswordEncoder) {
 
-        return appPasswordConfig.bcryptPasswordEncoder().encode("123");
+        // TODO - We want to SEE whether it's default bCryptPasswordEncoder encoder or OUR BEAN
+        // TODO - We do NOT use our BEAN?!
+
+        return bCryptPasswordEncoder.encode("123");
     }
 
     @GetMapping("/createDefaultUser")

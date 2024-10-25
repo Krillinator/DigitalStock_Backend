@@ -5,12 +5,13 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.AppPass
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class EnterpriseLektion6SpringSecurityIntroApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EnterpriseLektion6SpringSecurityIntroApplication.class, args);
+		ApplicationContext apc = SpringApplication.run(EnterpriseLektion6SpringSecurityIntroApplication.class, args);
 
 		System.out.println("---ADMIN---");
 		System.out.println(
@@ -27,6 +28,14 @@ public class EnterpriseLektion6SpringSecurityIntroApplication {
 		System.out.println(
 				UserRole.ADMIN.getAuthorities()
 		);
+
+		System.out.println("---BEANS---");
+
+
+		for(String s: apc.getBeanDefinitionNames()) {
+			System.out.println(s);
+		}
+
 
 	}
 
