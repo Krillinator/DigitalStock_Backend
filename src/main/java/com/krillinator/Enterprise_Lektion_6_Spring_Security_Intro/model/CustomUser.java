@@ -3,6 +3,9 @@ package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
@@ -14,9 +17,16 @@ public class CustomUser {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    // @NotEmpty - Mostly for collections
+    @NotBlank
+    @Size(min = 4, max = 32, message = "Must be between 4-32 chars")
     private String username;
+
+    @NotBlank
+    @Size(min = 7, max = 64, message = "Must be between 7-64 chars")
     private String password;
 
+    // TODO - Implement NotBlank possibly for <select> element?
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     private boolean isAccountNonExpired;

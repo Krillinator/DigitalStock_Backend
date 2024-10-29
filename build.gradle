@@ -28,6 +28,11 @@ dependencies {
 
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// TODO - Why versions/ without?
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.3'
+
 }
 
 tasks.named('test') {

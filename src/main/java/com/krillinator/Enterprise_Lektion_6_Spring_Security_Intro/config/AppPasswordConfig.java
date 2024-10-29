@@ -17,4 +17,10 @@ public class AppPasswordConfig {
         return new BCryptPasswordEncoder(15);   // Time based = Higher number, Slower the process
     }
 
+
+    public String test() {
+
+        return "";
+    }
+
 }
