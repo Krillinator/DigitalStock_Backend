@@ -23,7 +23,7 @@ public class CustomUser {
     private String username;
 
     @NotBlank
-    @Size(min = 7, max = 64, message = "Password must be between 7-64 chars")
+    @Size(min = 7, max = 80, message = "Password must be between 7-80 chars")
     private String password;
 
     // TODO - Implement NotBlank possibly for <select> element?

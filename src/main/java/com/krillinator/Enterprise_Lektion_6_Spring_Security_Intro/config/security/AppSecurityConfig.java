@@ -34,7 +34,8 @@ public class AppSecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/user/**").permitAll() // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
+                        .requestMatchers("/", "/login", "/user/*").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
+                        // .requestMatchers("/user/**")                          // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE,"/api/**").hasAuthority(UserPermission.DELETE.getPermission())
                         .requestMatchers("/admin").hasRole(UserRole.ADMIN.name())
