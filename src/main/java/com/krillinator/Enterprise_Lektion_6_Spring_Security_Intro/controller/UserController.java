@@ -28,10 +28,14 @@ public class UserController {
     public String registerUser(Model model) {
 
         model.addAttribute("customUser", new CustomUser()); // Must Reflect the name of our class
+        model.addAttribute("userRoles", UserRole.values());
 
         return "register";
     }
 
+    // TODO - Security Aspect for our Object
+    // TODO - Aspects of DTO for UserCredentials & Validation
+        // https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-initbinder.html#mvc-ann-initbinder-model-design
     @PostMapping("/register")
     public String registerUser(
             @Valid @ModelAttribute(name = "customUser") CustomUser customUser,   // Checks for constraints
@@ -42,11 +46,13 @@ public class UserController {
             return "register";      // add for query params ?error=someRandomError
         }
 
+        // TODO - Handle Duplicate Entries
+        // TODO - UserRole (DYNAMIC)
         userRepository.save(
                 new CustomUser(
                         customUser.getUsername(),
                         passwordEncoder.encode(customUser.getPassword()),
-                        UserRole.USER,
+                        customUser.getUserRole(),
                         true,
                         true,
                         true,

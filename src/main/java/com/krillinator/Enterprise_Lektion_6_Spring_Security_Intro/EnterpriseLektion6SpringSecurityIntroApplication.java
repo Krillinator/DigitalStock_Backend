@@ -7,6 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import java.util.Arrays;
+
 @SpringBootApplication
 public class EnterpriseLektion6SpringSecurityIntroApplication {
 
@@ -36,6 +38,11 @@ public class EnterpriseLektion6SpringSecurityIntroApplication {
 			System.out.println(s);
 		}
 
+		System.out.println(
+                Arrays.toString(UserRole.values())
+		);
+
+		UserRole.ADMIN.name();
 
 	}
 
