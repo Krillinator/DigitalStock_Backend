@@ -5,40 +5,37 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.CustomUs
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // TODO - Check for CustomUser as an alternate approach for Model model as args
     @GetMapping("/register")
     public String registerUser(Model model) {
 
-        model.addAttribute("user", new CustomUser());
+        model.addAttribute("customUser", new CustomUser()); // Must Reflect the name of our class
 
         return "register";
     }
 
-    // TODO - This does not work, cause: permission?
     @PostMapping("/register")
     public String registerUser(
-            @Valid CustomUser customUser,   // Checks for constraints
-            BindingResult bindingResult,    // Check for error handling
-            Model model
+            @Valid @ModelAttribute(name = "customUser") CustomUser customUser,   // Checks for constraints
+            BindingResult bindingResult    // Check for error handling
     ) {
 
         if (bindingResult.hasErrors()) {
@@ -48,8 +45,8 @@ public class UserController {
         userRepository.save(
                 new CustomUser(
                         customUser.getUsername(),
-                        customUser.getPassword(),
-                        UserRole.ADMIN,
+                        passwordEncoder.encode(customUser.getPassword()),
+                        UserRole.USER,
                         true,
                         true,
                         true,

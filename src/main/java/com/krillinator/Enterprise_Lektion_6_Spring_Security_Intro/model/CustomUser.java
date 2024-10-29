@@ -19,11 +19,11 @@ public class CustomUser {
 
     // @NotEmpty - Mostly for collections
     @NotBlank
-    @Size(min = 4, max = 32, message = "Must be between 4-32 chars")
+    @Size(min = 4, max = 32, message = "Username must be between 4-32 chars")
     private String username;
 
     @NotBlank
-    @Size(min = 7, max = 64, message = "Must be between 7-64 chars")
+    @Size(min = 7, max = 64, message = "Password must be between 7-64 chars")
     private String password;
 
     // TODO - Implement NotBlank possibly for <select> element?

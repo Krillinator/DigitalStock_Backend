@@ -37,9 +37,9 @@ public class AppSecurityConfig {
                         .requestMatchers("/", "/login", "/user/**").permitAll() // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE,"/api/**").hasAuthority(UserPermission.DELETE.getPermission())
-                        // .requestMatchers("/admin").hasRole(UserRole.ADMIN.name())
-                        .requestMatchers("/user").hasRole(UserRole.USER.name())
-                        .requestMatchers("/admin").hasAuthority(UserPermission.DELETE.getPermission()) // TODO ROLE_ not necessary here?
+                        .requestMatchers("/admin").hasRole(UserRole.ADMIN.name())
+                        .requestMatchers("/user").hasRole(UserRole.USER.name()) // TODO - ADMIN CAN ENTER
+                        // .requestMatchers("/admin").hasAuthority(UserPermission.DELETE.getPermission()) // TODO ROLE_ not necessary here?
                         .anyRequest().authenticated()
                 )
 
