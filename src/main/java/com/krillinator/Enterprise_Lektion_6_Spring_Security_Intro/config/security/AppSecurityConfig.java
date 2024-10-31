@@ -32,6 +32,7 @@ public class AppSecurityConfig {
     // TODO - Question - Do you want this class in .gitignore?
     // TODO - Question #2 - What does anyRequest & Authenticated, do that isn't done by default?
     // TODO - Question #8 - Bean alternative to Autowired
+    // TODO - Question #11 - Will static be found? It's inside the Java folder!
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,7 +40,7 @@ public class AppSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/user/*").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
+                        .requestMatchers("/", "/login", "/user/*", "/static/**", "/logout", "/custom-logout").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
                         // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/**").permitAll()     // New implementation
@@ -50,10 +51,31 @@ public class AppSecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .formLogin(withDefaults());
+                .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
+                                .loginPage("/login")
+                        // TODO - Implement redirecting on SUCCESS & FAILURE
+                )
+                .logout(logoutConfigurer -> logoutConfigurer
+                        .logoutUrl("/custom-logout")   // TODO - Endpoint for logging out?
+                )
+        ;
 
         return http.build();
     }
+
+    /* TODO - List of What is being overridden through formLogin.loginPage():
+        / login GET - the login form
+        / login POST - process the credentials and if valid authenticate the user
+        / login?error GET - redirect here for failed authentication attempts
+        / login?logout GET - redirect here after successfully logging out
+            If "/ authenticate" was passed to this method it update the defaults as shown below:
+            / authenticate GET - the login form
+            / authenticate POST - process the credentials and if valid authenticate the user
+            / authenticate?error GET - redirect here for failed authentication attempts
+            / authenticate?logout GET - redirect here after successfully logging out
+    *
+    *
+    * */
 
     /*
     // DEBUG USER
