@@ -3,9 +3,7 @@ package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
@@ -28,7 +26,7 @@ public class CustomUser {
 
     // TODO - Implement NotBlank possibly for <select> element?
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    @NotNull(message = "Role is Required") private UserRole userRole;
     private boolean isAccountNonExpired;
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;

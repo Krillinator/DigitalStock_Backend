@@ -5,14 +5,18 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.Us
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -33,13 +37,15 @@ public class AppSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/user/*").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
-                        // .requestMatchers("/user/**")                          // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
+                        // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/**").permitAll()     // New implementation
                         .requestMatchers(HttpMethod.DELETE,"/api/**").hasAuthority(UserPermission.DELETE.getPermission())
                         .requestMatchers("/admin").hasRole(UserRole.ADMIN.name())
-                        .requestMatchers("/user").hasRole(UserRole.USER.name()) // TODO - ADMIN CAN ENTER
+                        .requestMatchers("/user").hasRole(UserRole.USER.name())     // TODO - ADMIN CAN ENTER
                         // .requestMatchers("/admin").hasAuthority(UserPermission.DELETE.getPermission()) // TODO ROLE_ not necessary here?
                         .anyRequest().authenticated()
                 )

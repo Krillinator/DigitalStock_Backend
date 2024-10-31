@@ -4,12 +4,13 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.Us
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.AppPasswordConfig;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.CustomUser;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.repository.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -47,6 +48,19 @@ public class TestController {
         );
 
         return userRepository.save(customUser);
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<CustomUser> createNewUser(
+            @Valid @RequestBody CustomUser customUser,
+            BindingResult bindingResult
+    ) {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().body(customUser);
     }
 
 
