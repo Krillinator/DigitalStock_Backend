@@ -2,6 +2,7 @@ package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.securi
 
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserPermission;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,8 +16,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -34,11 +37,19 @@ public class AppSecurityConfig {
     // TODO - Question #8 - Bean alternative to Autowired
     // TODO - Question #11 - Will static be found? It's inside the Java folder!
 
+    private final CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    public AppSecurityConfig(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                // .csrf(AbstractHttpConfigurer::disable) // TODO - Remove disable, in production
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/user/*", "/static/**", "/logout", "/custom-logout").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
                         // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
@@ -55,9 +66,22 @@ public class AppSecurityConfig {
                                 .loginPage("/login")
                         // TODO - Implement redirecting on SUCCESS & FAILURE
                 )
+
                 .logout(logoutConfigurer -> logoutConfigurer
-                        .logoutUrl("/custom-logout")   // TODO - Endpoint for logging out?
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)      // TODO - Should Clear Authentication?
+                        .deleteCookies("remember-me", "JSESSIONID")
+                        .logoutUrl("/custom-logout")           // TODO - Endpoint for logging out?
                 )
+
+                // TODO - Parameter for cookies 'secure'
+                .rememberMe(rememberMeConfigurer -> rememberMeConfigurer
+                        .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))   // Validity from DAYS to Seconds TODO - Do we want to SHOW this information?
+                        .key("someSecureKey")                                         // TODO - generate secure key/token
+                        .userDetailsService(customUserDetailsService)
+                        .rememberMeParameter("remember-me")             // Default name
+                )
+
         ;
 
         return http.build();
