@@ -20,6 +20,7 @@ public class CustomUser {
     @Size(min = 4, max = 32, message = "Username must be between 4-32 chars")
     private String username;
 
+    // TODO - What the database can accept VS what can be written in the form
     @NotBlank
     @Size(min = 7, max = 80, message = "Password must be between 7-80 chars")
     private String password;

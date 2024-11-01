@@ -1,16 +1,17 @@
 package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.controller;
 
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
-import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.AppPasswordConfig;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.CustomUser;
+import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.dto.CustomUserDTO;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -63,6 +64,19 @@ public class TestController {
         return ResponseEntity.ok().body(customUser);
     }
 
+    @GetMapping("/get-my-username")
+    public ResponseEntity<CustomUserDTO> getCurrentUsername() {
+
+        Optional<CustomUser> customUser = userRepository.findByUsername("Benny");
+
+        if (customUser.isPresent()) {
+            CustomUserDTO customUserDTO = new CustomUserDTO(customUser.get());
+
+            return ResponseEntity.ok().body(customUserDTO);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
 
 
 }

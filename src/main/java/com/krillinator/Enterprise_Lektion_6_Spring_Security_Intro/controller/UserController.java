@@ -47,7 +47,6 @@ public class UserController {
         }
 
         // TODO - Handle Duplicate Entries
-        // TODO - UserRole (DYNAMIC)
         userRepository.save(
                 new CustomUser(
                         customUser.getUsername(),
