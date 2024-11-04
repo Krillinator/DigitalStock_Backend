@@ -51,7 +51,7 @@ public class AppSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // TODO - Remove disable, in production
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/user/*", "/static/**", "/logout", "/custom-logout").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
+                        .requestMatchers("/", "/login", "/user/*", "/static/**", "/logout", "/custom-logout", "/register").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
                         // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/**").permitAll()     // New implementation
@@ -64,7 +64,7 @@ public class AppSecurityConfig {
 
                 .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
                                 .loginPage("/login")
-                        // TODO - Implement redirecting on SUCCESS & FAILURE
+                                // TODO - Implement redirecting on SUCCESS & FAILURE
                 )
 
                 .logout(logoutConfigurer -> logoutConfigurer

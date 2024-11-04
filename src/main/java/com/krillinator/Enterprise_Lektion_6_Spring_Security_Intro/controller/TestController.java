@@ -15,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -85,7 +88,7 @@ public class TestController {
     }
 
     @PostMapping("/task")
-    public ResponseEntity<Task> createTask(
+    public ResponseEntity<String> createTask(
             @Valid @RequestBody Task task,
             BindingResult bindingResult
     ) {
@@ -114,11 +117,38 @@ public class TestController {
             return ResponseEntity.notFound().build();
         }
 
-        // Connect Task -> User
-        task.setCustomUser(currentUser.get());
+        // Set User Data
+        CustomUser customUser = currentUser.get();
+        List<CustomUser> userList = new ArrayList<>(List.of(customUser));
 
-        return ResponseEntity.status(201).body(taskRepository.save(task));
+        // Connect User -> Task
+        task.setCustomUser(userList);
+
+        // Save Task
+        Task savedTask = taskRepository.save(task);
+
+        // Prepare Data
+        List<Task> taskList = new ArrayList<>(List.of(savedTask));
+
+        // Connect Task -> User
+        customUser.setTaskList(taskList);
+        userRepository.save(customUser);
+
+        return ResponseEntity.status(201).body("Success!");
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 

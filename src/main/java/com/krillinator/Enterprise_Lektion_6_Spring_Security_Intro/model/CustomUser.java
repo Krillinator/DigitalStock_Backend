@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // TODO - Validation for getters/setters?
@@ -35,21 +36,21 @@ public class CustomUser {
     private boolean isEnabled;
 
     // TODO - ManyToAny?
-    @OneToMany(mappedBy = "customUser", cascade = CascadeType.ALL)
-    private List<Task> taskList;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "task_list",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id")
+    )
+    private List<Task> taskList = new ArrayList<>();
 
+    public List<Task> getTaskList() {
+        return taskList;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+    }
 
     public CustomUser() {}
     public CustomUser(String username, String password, UserRole userRole, boolean isAccountNonExpired, boolean isAccountNonLocked, boolean isCredentialsNonExpired, boolean isEnabled) {

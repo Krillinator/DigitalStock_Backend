@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Task {
 
@@ -21,15 +24,14 @@ public class Task {
     private String description;
 
     // TODO - Avoid including a USER in POSTMAN
-    @ManyToOne
-    @JoinColumn(name = "custom_user_id")
-    private CustomUser customUser;
+    @ManyToMany(mappedBy = "taskList")
+    private List<CustomUser> customUser;
 
-    public CustomUser getCustomUser() {
+    public List<CustomUser> getCustomUser() {
         return customUser;
     }
 
-    public void setCustomUser(CustomUser customUser) {
+    public void setCustomUser(List<CustomUser> customUser) {
         this.customUser = customUser;
     }
 
