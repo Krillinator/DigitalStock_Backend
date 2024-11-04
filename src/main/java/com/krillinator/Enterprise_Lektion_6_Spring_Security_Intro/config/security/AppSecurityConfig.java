@@ -49,7 +49,7 @@ public class AppSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // .csrf(AbstractHttpConfigurer::disable) // TODO - Remove disable, in production
+                .csrf(AbstractHttpConfigurer::disable) // TODO - Remove disable, in production
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/user/*", "/static/**", "/logout", "/custom-logout").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
                         // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
@@ -80,9 +80,7 @@ public class AppSecurityConfig {
                         .key("someSecureKey")                                         // TODO - generate secure key/token
                         .userDetailsService(customUserDetailsService)
                         .rememberMeParameter("remember-me")             // Default name
-                )
-
-        ;
+                );
 
         return http.build();
     }

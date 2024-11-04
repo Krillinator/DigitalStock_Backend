@@ -1,12 +1,13 @@
 package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
+
+// TODO - Validation for getters/setters?
 
 @Entity
 public class CustomUser {
@@ -32,6 +33,23 @@ public class CustomUser {
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
+
+    // TODO - ManyToAny?
+    @OneToMany(mappedBy = "customUser", cascade = CascadeType.ALL)
+    private List<Task> taskList;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public CustomUser() {}
     public CustomUser(String username, String password, UserRole userRole, boolean isAccountNonExpired, boolean isAccountNonLocked, boolean isCredentialsNonExpired, boolean isEnabled) {

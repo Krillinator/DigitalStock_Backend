@@ -25,6 +25,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
 
+        System.out.println("---DEBUGGING LOGIN---");
+        System.out.println("IT WENT THROUGH");
+        System.out.println("---DEBUGGING LOGIN---");
+
         return new CustomUserDetails(customUser);
     }
 }
