@@ -11,16 +11,7 @@ public class AppPasswordConfig {
     @Bean
     public PasswordEncoder bcryptPasswordEncoder() {
 
-        System.out.println("TEST");
-
         // Default value = 10
         return new BCryptPasswordEncoder(15);   // Time based = Higher number, Slower the process
     }
-
-
-    public String test() {
-
-        return "";
-    }
-
 }

@@ -49,9 +49,13 @@ public class AppSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable) // TODO - Remove disable, in production
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/user/*", "/static/**", "/logout", "/custom-logout", "/register").permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
+                        .requestMatchers("/",
+                                "/login", "/user/*", "/static/**", "/logout",
+                                "/custom-logout", "/register", "/api/v1/user", "/user"
+                        ).permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
                         // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/**").permitAll()     // New implementation
@@ -85,36 +89,6 @@ public class AppSecurityConfig {
         return http.build();
     }
 
-    /* TODO - List of What is being overridden through formLogin.loginPage():
-        / login GET - the login form
-        / login POST - process the credentials and if valid authenticate the user
-        / login?error GET - redirect here for failed authentication attempts
-        / login?logout GET - redirect here after successfully logging out
-            If "/ authenticate" was passed to this method it update the defaults as shown below:
-            / authenticate GET - the login form
-            / authenticate POST - process the credentials and if valid authenticate the user
-            / authenticate?error GET - redirect here for failed authentication attempts
-            / authenticate?logout GET - redirect here after successfully logging out
-    *
-    *
-    * */
 
-    /*
-    // DEBUG USER
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.builder()
-                .passwordEncoder(passwordEncoder::encode) // TODO THE CHANGE
-                .username("benny")
-                .password("123") // TODO THE CHANGE
-                .authorities(UserRole.USER.getAuthorities()) // ROLE + Permissions
-                .build();
-
-        System.out.println("PASSWORD FOR DEBUG USER " + user.getPassword());
-
-        return new InMemoryUserDetailsManager(user);
-    }
-
-     */
 
 }
