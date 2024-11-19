@@ -2,7 +2,10 @@ package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.securi
 
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserPermission;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -54,8 +57,11 @@ public class AppSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/",
                                 "/login", "/user/*", "/static/**", "/logout",
-                                "/custom-logout", "/register", "/api/v1/user", "/user"
+                                "/custom-logout", "/register", "/api/v1/who-am-i", "/user",
+                                "/bananas"
                         ).permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
+
+                        // TODO - Test Authorities with Separate-Frontend
                         // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/**").permitAll()     // New implementation
@@ -67,7 +73,23 @@ public class AppSecurityConfig {
                 )
 
                 .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
-                                .loginPage("/login")
+
+                                // POST must be of: x-www-form-urlencoded
+                                // CSRF implementation (do not forget)
+                                //.successForwardUrl("http://localhost:3000") // TODO - TEST
+                                .loginProcessingUrl("/bananas") // Override Login Endpoint (Stateful approach)
+                                .successHandler((request, response, authentication) -> {
+                                    response.setStatus(HttpServletResponse.SC_OK); // Respond with 200 OK
+                                    response.setContentType("application/json");
+                                    response.getWriter().write("{\"message\":\"Login successful\"}"); // Return JSON instead of redirecting
+                                })
+                                .failureHandler((request, response, exception) -> {
+                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Respond with 401 Unauthorized
+                                    response.setContentType("application/json");
+                                    response.getWriter().write("{\"error\":\"Invalid credentials\"}");
+                                })
+                                .failureForwardUrl("/bananas?error")
+                                // .loginPage("/login")
                                 // TODO - Implement redirecting on SUCCESS & FAILURE
                 )
 
