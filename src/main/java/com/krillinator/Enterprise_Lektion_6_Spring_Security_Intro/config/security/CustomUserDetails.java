@@ -27,6 +27,7 @@ public class CustomUserDetails implements UserDetails {
         this.isCredentialsNonExpired = isCredentialsNonExpired;
         this.isEnabled = isEnabled;
     }
+
     public CustomUserDetails(CustomUser customUser) {
         this.username = customUser.getUsername();
         this.password = customUser.getPassword();

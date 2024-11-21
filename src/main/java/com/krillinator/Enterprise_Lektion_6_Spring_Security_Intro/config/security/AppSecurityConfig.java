@@ -2,23 +2,31 @@ package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.securi
 
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserPermission;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
+import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.AppPasswordConfig;
+import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.jwt.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
 
 import java.util.Arrays;
@@ -40,77 +48,52 @@ public class AppSecurityConfig {
     // TODO - Question #8 - Bean alternative to Autowired
     // TODO - Question #11 - Will static be found? It's inside the Java folder!
 
+    private final AppPasswordConfig appPasswordConfig;
     private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
-    public AppSecurityConfig(CustomUserDetailsService customUserDetailsService) {
+    public AppSecurityConfig(AppPasswordConfig appPasswordConfig, CustomUserDetailsService customUserDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.appPasswordConfig = appPasswordConfig;
         this.customUserDetailsService = customUserDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable) // TODO - Remove disable, in production
+                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for stateless API authentication
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/",
-                                "/login", "/user/*", "/static/**", "/logout",
-                                "/custom-logout", "/register", "/api/v1/who-am-i", "/user",
-                                "/bananas"
-                        ).permitAll()     // TODO - /register Post Permission? Cause: Might be GET permissions ,Security Check
-
-                        // TODO - Test Authorities with Separate-Frontend
-                        // .requestMatchers("/user/**")                                      // TODO - This will allow ADMINS to enter localhost:8080/user <-- NOT GOOD
-                        .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/**").permitAll()     // New implementation
-                        .requestMatchers(HttpMethod.DELETE,"/api/**").hasAuthority(UserPermission.DELETE.getPermission())
-                        .requestMatchers("/admin").hasRole(UserRole.ADMIN.name())
-                        .requestMatchers("/user").hasRole(UserRole.USER.name())     // TODO - ADMIN CAN ENTER
-                        // .requestMatchers("/admin").hasAuthority(UserPermission.DELETE.getPermission()) // TODO ROLE_ not necessary here?
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/v2/**", "/register", "/bananas", "/user/*", "/static/**").permitAll()  // Public endpoints
+                        .requestMatchers("/admin").hasRole(UserRole.ADMIN.name())  // ADMIN role required for /admin
+                        .requestMatchers("/user").hasRole(UserRole.USER.name())  // USER role required for /user
+                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll()  // Open GET API access
+                        .requestMatchers(HttpMethod.POST, "/api/**").permitAll()  // Open POST API access
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasAuthority(UserPermission.DELETE.getPermission())  // Only authorized DELETE requests
+                        .anyRequest().authenticated()  // All other requests require authentication
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Disable session creation for stateless authentication
                 )
 
-                .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
-
-                                // POST must be of: x-www-form-urlencoded
-                                // CSRF implementation (do not forget)
-                                //.successForwardUrl("http://localhost:3000") // TODO - TEST
-                                .loginProcessingUrl("/bananas") // Override Login Endpoint (Stateful approach)
-                                .successHandler((request, response, authentication) -> {
-                                    response.setStatus(HttpServletResponse.SC_OK); // Respond with 200 OK
-                                    response.setContentType("application/json");
-                                    response.getWriter().write("{\"message\":\"Login successful\"}"); // Return JSON instead of redirecting
-                                })
-                                .failureHandler((request, response, exception) -> {
-                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Respond with 401 Unauthorized
-                                    response.setContentType("application/json");
-                                    response.getWriter().write("{\"error\":\"Invalid credentials\"}");
-                                })
-                                .failureForwardUrl("/bananas?error")
-                                // .loginPage("/login")
-                                // TODO - Implement redirecting on SUCCESS & FAILURE
-                )
-
-                .logout(logoutConfigurer -> logoutConfigurer
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)      // TODO - Should Clear Authentication?
-                        .deleteCookies("remember-me", "JSESSIONID")
-                        .logoutUrl("/custom-logout")           // TODO - Endpoint for logging out?
-                )
-
-                // TODO - Parameter for cookies 'secure'
-                .rememberMe(rememberMeConfigurer -> rememberMeConfigurer
-                        .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))   // Validity from DAYS to Seconds TODO - Do we want to SHOW this information?
-                        .key("someSecureKey")                                         // TODO - generate secure key/token
-                        .userDetailsService(customUserDetailsService)
-                        .rememberMeParameter("remember-me")             // Default name
-                );
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter
 
         return http.build();
     }
 
+    // Override Springs default authentication logic
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(customUserDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(appPasswordConfig.bcryptPasswordEncoder());
+
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(daoAuthenticationProvider);
+
+        return authenticationManagerBuilder.build();
+    }
 
 
 }

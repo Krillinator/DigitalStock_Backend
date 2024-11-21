@@ -15,18 +15,18 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtUtils {
-/*
-    private final String base64EncodedSecretKey = "your_base64_encoded_secret_key";  // Replace this with your actual base64 encoded secret key
+    private final String base64EncodedSecretKey = "U2VjdXJlQXBpX1NlY3JldEtleV9mb3JfSFMyNTYwX3NlY3JldF9wcm9qZWN0X2tleV9leGFtcGxl";  // Replace this with your actual base64 encoded secret key
     byte[] keyBytes = Base64.getDecoder().decode(base64EncodedSecretKey);
 
-    Key key = Keys.hmacShaKeyFor(keyBytes);  // This ensures the key is properly named and sized
+    SecretKey key = Keys.hmacShaKeyFor(keyBytes);  // This ensures the key is properly named and sized
 
     // JWT expiration time (1 hour in milliseconds)
     private final int jwtExpirationMs = (int) TimeUnit.HOURS.toMillis(1);
 
-    public String generateJwtToken(String username) {
+    public String generateJwtToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)  // Set the subject, often the username or user ID
+                .claim("role", role)
                 .issuedAt(new Date())  // Set issued date
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))  // Set expiration date
                 .signWith(key)  // Use the key created for HMAC
@@ -34,28 +34,38 @@ public class JwtUtils {
     }
 
     public String getUsernameFromJwtToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
 
         return claims.getSubject();
     }
 
+    public String getRoleFromJwtToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+
+        return claims.get("role", String.class);  // Extract the role from the claims
+    }
+
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(authToken);
-            return true;
+            Jwts.parser()  // Use parserBuilder() instead of deprecated parser()
+                    .verifyWith(key)  // Provide the signing key for validation
+                    .build()  // Build the JwtParser
+                    .parseSignedClaims(authToken);  // Parse and verify the JWT
+            return true;  // If no exception is thrown, the token is valid
         } catch (Exception e) {
             // Log token validation errors (like expiration, malformed, etc.)
             System.err.println("Invalid JWT token: " + e.getMessage());
         }
-        return false;
+        return false;  // If an exception is thrown, the token is invalid
     }
 
- */
 }

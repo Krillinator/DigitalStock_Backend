@@ -17,16 +17,15 @@ public class CorsConfig {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.addAllowedOrigin("http://localhost:3000"); // Frontend
-        corsConfiguration.addAllowedMethod("*");    // GET POST PUT DELETE
-        corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        corsConfiguration.setExposedHeaders(List.of("Set-Cookie"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000", "http://172.0.0.1:3000"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST"));    // GET POST PUT DELETE
+        corsConfiguration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With"));
         corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/v1/register", corsConfiguration); // Backend
         source.registerCorsConfiguration("/api/v1/who-am-i", corsConfiguration);
-        source.registerCorsConfiguration("/bananas", corsConfiguration);
+        source.registerCorsConfiguration("/api/**", corsConfiguration);
 
         return source;
     }

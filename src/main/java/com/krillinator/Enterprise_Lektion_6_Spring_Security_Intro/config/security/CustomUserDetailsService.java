@@ -21,6 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
+        // Entity
         CustomUser customUser = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
@@ -29,6 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("IT WENT THROUGH");
         System.out.println("---DEBUGGING LOGIN---");
 
+        // Cast to UserDetails
         return new CustomUserDetails(customUser);
     }
 }

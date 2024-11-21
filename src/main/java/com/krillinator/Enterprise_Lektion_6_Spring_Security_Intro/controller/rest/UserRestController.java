@@ -10,17 +10,17 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Locale;
 
 // /api/v1
@@ -47,19 +47,29 @@ public class UserRestController extends AbstractApiRestController {
     }
 
     @GetMapping("/who-am-i")
-    public String checkedLoggedInUser(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
-        HttpSession session = request.getSession(); // TODO - Creates a new session
+    public ResponseEntity<String> checkedLoggedInUser(HttpServletRequest request) {
 
-        // Debugging logs
-        System.out.println("Session exists: " + (session != null));
-        System.out.println("Session ID: " + (session != null ? session.getId() : "No Session"));
-        System.out.println("User: " + (userDetails != null ? userDetails.getUsername() : "No User"));
+        System.out.println("Headers received:");
+        request.getHeaderNames().asIterator().forEachRemaining(headerName ->
+                System.out.println(headerName + ": " + request.getHeader(headerName))
+        );
 
-        if (userDetails == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        System.out.println("---who-am-i---");
+
+        System.out.println(authentication);
+
+        // Check if the user is authenticated (it won't be null if the filter worked correctly)
+        if (authentication != null && authentication.isAuthenticated()) {
+            // Extract the username (or any other user details from the authentication object)
+            String username = authentication.getName();  // The username is typically stored as the principal
+            System.out.println(username);
+            return ResponseEntity.ok("Logged in user: " + username);
+        } else {
+            return ResponseEntity.status(401).body("User is not authenticated");
         }
 
-        return userDetails.getUsername();
     }
 
     @PostMapping("/register")
