@@ -2,6 +2,7 @@ package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.controller.er
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.ui.Model;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,6 +11,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(BadCredentialsException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO("Invalid username or password", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED); // 401 status for bad credentials
+    }
 
     // Handle NullPointerException and return a JSON response
     @ExceptionHandler(NullPointerException.class)

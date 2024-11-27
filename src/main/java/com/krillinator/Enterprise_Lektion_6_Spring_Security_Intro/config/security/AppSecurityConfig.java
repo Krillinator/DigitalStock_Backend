@@ -4,11 +4,7 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.Us
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.authorities.UserRole;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.AppPasswordConfig;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.jwt.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,19 +16,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
-
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -73,6 +58,7 @@ public class AppSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/**").hasAuthority(UserPermission.DELETE.getPermission())  // Only authorized DELETE requests
                         .anyRequest().authenticated()  // All other requests require authentication
                 )
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Disable session creation for stateless authentication
                 )

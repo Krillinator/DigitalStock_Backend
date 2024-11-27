@@ -3,12 +3,18 @@ package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.controller.re
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.CustomUserDetails;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.jwt.JwtUtils;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.dto.UserRegistrationDTO;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v2/auth")
@@ -46,20 +52,47 @@ public class AuthenticationRestController {
     }
 
     @PostMapping("/login")
-    public String authenticateUser(@RequestParam String username, @RequestParam String password) {
-        // Authenticate user using AuthenticationManager
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);  // This triggers the CustomUserDetailsService
+    public ResponseEntity<String> authenticateUser(
+            @RequestParam String username,
+            @RequestParam String password,
+            HttpServletResponse response
+    ) {
+        try {
+            // Authenticate user using AuthenticationManager
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);  // This triggers the CustomUserDetailsService
 
-        // IMPORTANT - MUST BE THE SAME TYPE AS RETURNED WITHIN - CUSTOM_USER_DETAILS_SERVICE CLASS
-        CustomUserDetails customUser = (CustomUserDetails) authentication.getPrincipal();
+            // IMPORTANT - MUST BE THE SAME TYPE AS RETURNED WITHIN - CUSTOM_USER_DETAILS_SERVICE CLASS
+            CustomUserDetails customUser = (CustomUserDetails) authentication.getPrincipal();
 
-        // Type-check
-        if (customUser instanceof CustomUserDetails customUserDetails) {
+            // Type-check
+            if (customUser instanceof CustomUserDetails customUserDetails) {
+                System.out.println("-------------------");
+                System.out.println(customUserDetails.getAuthorities().toString());
+                System.out.println("-------------------");
+                final String token = jwtUtils.generateJwtToken(
+                        customUserDetails.getUsername(),
+                        customUserDetails.getAuthorities().toString()
+                );
 
-            return jwtUtils.generateJwtToken(customUserDetails.getUsername(), "ADMIN");
-        } else {
-            throw new IllegalStateException("Authenticated principal is not of type CustomUserDetails.");
+                // Prepare Cookie
+                Cookie cookie = new Cookie("authToken", token);
+                cookie.setHttpOnly(true); // No JS (prevent XSS)
+                cookie.setSecure(false); // HTTPS
+                cookie.setPath("/"); // Available to whole App
+                cookie.setMaxAge((int) TimeUnit.HOURS.toSeconds(1));
+                response.addCookie(cookie);
+
+                System.out.println(cookie);
+
+                return ResponseEntity.ok(token);
+            } else {
+                return ResponseEntity.internalServerError().body("Authenticated principal is not of type CustomUserDetails");
+            }
+        } catch (BadCredentialsException e) {
+
+            // Important - This can't be caught by global exception handler - handle manually
+            return ResponseEntity.status(401).body("Bad Credentials..");
         }
 
     }

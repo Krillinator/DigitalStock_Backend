@@ -13,36 +13,7 @@ import java.util.Arrays;
 public class EnterpriseLektion6SpringSecurityIntroApplication {
 
 	public static void main(String[] args) {
-		ApplicationContext apc = SpringApplication.run(EnterpriseLektion6SpringSecurityIntroApplication.class, args);
-
-		System.out.println("---ADMIN---");
-		System.out.println(
-				UserRole.ADMIN.getListOfPermissions()
-		);
-
-		System.out.println("---USER---");
-		System.out.println(
-				UserRole.USER.getListOfPermissions()
-		);
-
-		System.out.println("---GetAuthorities---");
-		System.out.println(UserRole.ADMIN.name()); // Should not return ROLE_ + name
-		System.out.println(
-				UserRole.ADMIN.getAuthorities()
-		);
-
-		System.out.println("---BEANS---");
-
-
-		for(String s: apc.getBeanDefinitionNames()) {
-			System.out.println(s);
-		}
-
-		System.out.println(
-                Arrays.toString(UserRole.values())
-		);
-
-		UserRole.ADMIN.name();
+		 SpringApplication.run(EnterpriseLektion6SpringSecurityIntroApplication.class, args);
 
 	}
 

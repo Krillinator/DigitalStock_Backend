@@ -1,8 +1,10 @@
 package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.jwt;
 
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.CustomUserDetailsService;
+import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +30,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    )
+            throws ServletException, IOException
+    {
         System.out.println("---JwtAuthenticationFilter---");
         System.out.println("---START---");
         System.out.println("EXTRACTING FROM REQUEST");
-        String token = extractJwtFromRequest(request);
+        String token = extractJwtFromCookie(request);
         System.out.println("TOKEN: " + token);
         System.out.println("---END---");
 
@@ -50,6 +58,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private String extractJwtFromCookie(HttpServletRequest request) {
+        // Extract JWT from cookies
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("authToken".equals(cookie.getName())) {
+                    return cookie.getValue(); // Return the token if found
+                }
+            }
+        }
+        return null;
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {

@@ -5,23 +5,17 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.CustomUs
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.dto.UserRegistrationDTO;
 import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Locale;
 
 // /api/v1
 @RestController
@@ -55,17 +49,16 @@ public class UserRestController extends AbstractApiRestController {
         );
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         System.out.println("---who-am-i---");
-
         System.out.println(authentication);
 
         // Check if the user is authenticated (it won't be null if the filter worked correctly)
         if (authentication != null && authentication.isAuthenticated()) {
             // Extract the username (or any other user details from the authentication object)
+            System.out.println(authentication.getAuthorities());
             String username = authentication.getName();  // The username is typically stored as the principal
             System.out.println(username);
-            return ResponseEntity.ok("Logged in user: " + username);
+            return ResponseEntity.ok("Logged in user: " + username + authentication.getAuthorities());
         } else {
             return ResponseEntity.status(401).body("User is not authenticated");
         }

@@ -25,6 +25,7 @@ public class JwtUtils {
 
     public String generateJwtToken(String username, String role) {
         return Jwts.builder()
+                // TODO - Is the username unique?
                 .subject(username)  // Set the subject, often the username or user ID
                 .claim("role", role)
                 .issuedAt(new Date())  // Set issued date
