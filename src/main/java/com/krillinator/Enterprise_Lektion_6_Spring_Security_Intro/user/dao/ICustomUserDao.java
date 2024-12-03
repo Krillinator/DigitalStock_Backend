@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface ICustomUserDao {
 
-    List<CustomUser> filterAllUsersByTask(Long taskId);
+    List<CustomUser> filterAllUsersByTaskId(Long taskId);
 
 }

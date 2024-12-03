@@ -19,7 +19,7 @@ public class CustomUserDaoImpl implements ICustomUserDao {
     }
 
     @Override
-    public List<CustomUser> filterAllUsersByTask(Long taskId) {
+    public List<CustomUser> filterAllUsersByTaskId(Long taskId) {
 
         // JPQL - Documentation
         // SELECT <entity or attribute> FROM <entity> <alias> [WHERE <condition>]

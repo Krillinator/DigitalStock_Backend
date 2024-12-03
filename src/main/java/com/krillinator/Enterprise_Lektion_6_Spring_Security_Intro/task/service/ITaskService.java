@@ -4,6 +4,8 @@ import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.application.ut
 
 public interface ITaskService {
 
-    DatabaseUtils.UserExistenceStatus shareTaskWithUser(Long taskId, String ownerUsername, String partnerUsername);
+    DatabaseUtils.UserExistenceStatus shareTaskWithUser(
+            Long taskId, String ownerUsername, String partnerUsername
+    );
 
 }

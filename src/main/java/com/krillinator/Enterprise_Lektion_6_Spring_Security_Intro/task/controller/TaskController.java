@@ -146,8 +146,6 @@ public class TaskController extends AbstractApiRestController {
         userRepository.save(customUser);  // Only saving the owning side is needed
 
         return ResponseEntity.status(201).body("Success!");
-
-        // TODO - GO TO POSTMAN, LOGIN as BENNY - CREATE TWO TASKS -> FETCH TASKS - PROBLEM?
     }
 
 

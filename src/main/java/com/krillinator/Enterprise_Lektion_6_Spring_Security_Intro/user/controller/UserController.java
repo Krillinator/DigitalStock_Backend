@@ -36,15 +36,17 @@ public class UserController extends AbstractApiRestController {
     }
 
     @GetMapping("/users/by-task/{taskId}")
-    public ResponseEntity<List<CustomUser>> getUsersByTaskId(@PathVariable Long taskId) {
+    public ResponseEntity<List<String>> getUsersByTaskId(@PathVariable Long taskId) {
 
-        List<CustomUser> userList = iCustomUserDAO.filterAllUsersByTask(taskId);
+        List<CustomUser> userList = iCustomUserDAO.filterAllUsersByTaskId(taskId);
 
         if (userList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(userList);
+        List<String> usernames = userList.stream().map(CustomUser::getUsername).toList();
+
+        return ResponseEntity.ok(usernames);
     }
 
     @GetMapping("/hello")

@@ -38,7 +38,12 @@ public class DatabaseUtils {
      *         (or null if the user was not found).
      * @throws IllegalArgumentException if the provided usernames are null or empty.
      */
-     public static UserExistenceResult checkUsersExistence(String ownerUsername, String partnerUsername, UserRepository userRepository) {
+     public static UserExistenceResult checkUsersExistence(
+             String ownerUsername,
+             String partnerUsername,
+             UserRepository userRepository
+     )
+     {
         if (ownerUsername == null || ownerUsername.isEmpty() || partnerUsername == null || partnerUsername.isEmpty()) {
             throw new IllegalArgumentException("Usernames cannot be null or empty.");
         }
