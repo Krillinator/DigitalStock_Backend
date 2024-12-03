@@ -1,8 +1,8 @@
 package com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.controller.rest;
 
-import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.CustomUserDetails;
-import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.config.security.jwt.JwtUtils;
-import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.model.dto.UserRegistrationDTO;
+import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.application.config.security.CustomUserDetails;
+import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.application.config.security.jwt.JwtUtils;
+import com.krillinator.Enterprise_Lektion_6_Spring_Security_Intro.user.dto.UserRegistrationDTO;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @RestController
